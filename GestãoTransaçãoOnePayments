@@ -1,0 +1,74 @@
+/// <reference types="cypress"/>
+
+const idConvenioDeCobranca = '41';
+const nome = 'Teste One Payments';
+
+describe.skip('One Payments, Cancelamentos de Transação', { retries: { runMode: 2, openMode: 0, } }, function () {
+
+    it('One Payments, Incluir Autorização', function () {
+
+        cy.login('adm');
+        cy.log('INCLUIR AUTORIZAÇÃO DE COBRANÇA')
+        cy.irTelaAluno(nome)
+        cy.incluirAutorizacaoCobranca(idConvenioDeCobranca, nome);
+    })
+       
+    it('Lançar venda e fluxo de pagamento com convênio One Payments', function () {
+     cy.log('Lançamento de venda avusa e pagamento')
+     cy.LancarVendaAvulsaParaAluno(nome) 
+     cy.get('#form\\:btnReceberCaixaAberto').click()
+     cy.fluxoPagamento('CARTÃO DE CRÉDITO - ONLINE')
+
+    })
+
+    it(' Cancelar transação na tela do aluno', function () {
+     cy.log('INICIO TESTE CANCELAR TRANSAÇÃO TELA DO ALUNO')
+     cy.waitVisible('#form\\:nomeResponsavelPagamentolink', 0, 1500)
+     cy.get('#form\\:nomeResponsavelPagamentolink').click()
+
+     cy.waitVisible('#form\\:btnClienteFinanceiro', 0, 1000)
+     cy.get('#form\\:btnClienteFinanceiro').click()
+     cy.waitVisible('#form\\:idbtnCobrancas', 0, 1000)
+     cy.get('#form\\:idbtnCobrancas').click()
+     cy.get('#form\\:tblTransacoes\\:tb').find('tr').first().find('.TRANSACAO-AUTORIZACAO-CODIGO').should('not.be.empty')
+        
+     cy.get('#form\\:tblTransacoes\\:tb a').last().click()
+     cy.waitVisible('#formModalCancelarTransacao\\:confirmarCancelarTransacao', 0, 1000)
+     cy.get('#formModalCancelarTransacao\\:confirmarCancelarTransacao').click()
+     cy.waitVisible('#messageInfo', 0, 50)
+     cy.get('#messageInfo').should('contain', 'Transação cancelada com sucesso.')
+     cy.get('#form\\:tblTransacoes\\:tb a').should('have.length', 6)
+
+    })
+
+   it('Pesquisar parcelas em aberto', function () {
+
+     cy.irTelaAluno(nome)
+     cy.waitVisible('#form\\:linkCaixaEmAbertoText', 0, 1000)
+     cy.get('#form\\:linkCaixaEmAbertoText').click()
+     cy.wait(25000) //Adicionado porquê demora na mudança de tela, dando timeout no waitVisible abaixo
+     cy.waitVisible('#form\\:botaoBuscarParcelas', 0, 500)
+     cy.get('#form\\:tabelaItens\\:0\\:selecionarTodasParcelas').check()
+     cy.waitVisible('#form\\:btnReceberCaixaAberto', 0, 2000)
+
+    })
+
+
+    it('Receber com dinheiro a transação cancelada', function () {
+
+     cy.log('INICIO TESTE RECEBER COM DINHEIRO')
+     cy.get('#form\\:btnReceberCaixaAberto').click({ force: true })
+     cy.fluxoPagamento('DINHEIRO')
+
+    })
+
+    it('Validar convênio cadastrado no aluno', function () {
+
+     cy.login('adm');
+     cy.irTelaAluno(nome);
+     cy.waitVisible('#form\\:editCobrancaTextAluno');
+     cy.get('#form\\:editCobrancaTextAluno').should('contain', 'TESTE ONE PAYMENT')
+
+     })
+
+})

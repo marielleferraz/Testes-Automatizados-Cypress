@@ -1,0 +1,45 @@
+
+/// <reference types="cypress" />
+
+
+describe.skip('Excluir convenio cobrança', () => {
+
+//skip para liberar versão. Codigo já corrigido.
+    it('Cadastro convenio cobrança', () => {
+
+        cy.login('adm');
+        cy.visit('faces/convenioCobrancaCons.jsp');
+        cy.waitVisible('#form\\:btnNovo');
+        cy.get('#form\\:btnNovo').click();
+        cy.waitVisible('#form\\:salvar');
+        cy.get('#form\\:tipoConvenio').select('DCC_GETNET_ONLINE');
+        cy.waitVisible('#form\\:descricao');
+        cy.get('#form\\:descricao').type('convenio de teste');
+        cy.waitVisible('#form\\:numeroContrato');
+        cy.get('#form\\:numeroContrato').type('12345{enter}');
+        cy.waitVisible('#form\\:codigoAutenticacao01');
+        cy.value('#form\\:codigoAutenticacao01', '12345');
+        cy.wait(1000)
+        cy.waitVisible('#form\\:codigoAutenticacao02');
+        cy.wait(1000)
+        cy.value('#form\\:codigoAutenticacao02', '00000-111-00000-1111-0000');
+        cy.wait(2000)
+        cy.value('#form\\:codigoAutenticacao03', '111111');
+        cy.wait(1000)
+        cy.get('#form\\:codigoAutenticacao03').click({ force: true});
+        cy.waitVisible('#form\\:salvar');
+        cy.wait(1000)
+        cy.get('#form\\:salvar').click({force:true});
+        cy.waitVisible('.mensagem');
+        cy.get('.mensagem').should('have.text', 'Dados gravados com sucesso!');
+
+    })
+
+    it('Excluir convenio',() =>{
+        cy.get('#form\\:excluir').click()
+        cy.get('#formMdlMensagemGenerica\\:sim').click({force:true});
+        cy.waitVisible('.mensagem');
+        cy.get('.mensagem').should('contain', 'Dados Excluídos com Sucesso');
+       
+    })
+});       

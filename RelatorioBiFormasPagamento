@@ -1,0 +1,34 @@
+/// <reference types="cypress"/>
+
+import {nome} from '../../../support/commands';
+
+describe('Relatorio Formas de pagamento', () => {
+  before( () => {
+   cy.logout()
+   cy.login('adm')
+   cy.CadastrarCliente(); 
+   cy.get('body').then($el=>{ 
+     
+     cy.log('NOME: ' + nome);
+     cy.LancarVendaAvulsaParaAluno(nome);
+     cy.get('#form\\:btnReceberCaixaAberto').click()
+     cy.fluxoPagamento();
+     
+   }) 
+    
+   }) 
+  
+         it('Relatorio Dinheiro',() => {
+         cy.logout()
+         cy.login('fin')
+         cy.get('#form\\:btnBIFinan').click({force : true})
+         cy.waitVisible('#form\\:btnAtualizarResumoReceitas')
+         cy.get('#form\\:btnAtualizarResumoReceitas').click({force : true})
+         cy.waitVisible('#form\\:graficoFP')
+         cy.get('#form\\:graficoFP').should('contain','DI')
+         
+
+          })
+  
+
+  })

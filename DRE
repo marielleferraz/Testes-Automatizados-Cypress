@@ -1,0 +1,140 @@
+/// <reference types="cypress"/>
+
+
+const descricaoConta = 'Conta TESTE'
+//const descricaoContaEditado = 'teste de conta editado'
+
+const dataVencimento = Cypress.dayjs().add(30, 'day').format('DD/MM/YYYY');
+const dataCompetencia = Cypress.dayjs().format('DD/MM/YYYY');
+
+describe('Excluir conta', () => {
+
+ before(() => {
+   
+    cy.logout()
+    cy.login('fin')
+    
+ })
+
+      it('Cadastro de conta',()=>{
+      //Cadastro conta
+     cy.visit('faces/finanContaCons.jsp?modulo=financeiroWeb')
+     cy.waitVisible('#form\\:btnNovo')
+     cy.get('#form\\:btnNovo').click({ force: true })
+     cy.waitVisible('#form\\:empresaCombo')
+     cy.get('#form\\:empresaCombo').select('1')  
+     cy.get('#form\\:tipoContaCombo').select('1')  
+     cy.get('#form\\:descricaoRichEditor').type(descricaoConta)    
+     cy.get('#form\\:j_id_jsp_1168590460_51').click({ force: true })
+     cy.get('.mensagem').should('have.text', 'Dados Gravados com Sucesso');
+
+     
+    })
+
+    
+    it('Filtro',()=>{
+    //Teste do filtro
+     cy.get('[value="Voltar para a Lista"]').click()
+     cy.waitVisible('#tblConta')
+     cy.get('.dataTables_filter > div').clear().type(descricaoConta)
+
+
+    })
+
+       
+    it('Conta D.R.E', () => {
+     //Validando cadastro de conta no D.R.E
+
+     cy.logout()
+     cy.login('fin')
+     
+     //Abrir lupa e pesquisar D.R.E
+     cy.waitVisible('#form\\:lupaAtiva')
+     cy.get('#form\\:lupaAtiva').click({ force: true })
+     cy.get('.panelBusca').type('DRE')
+     cy.wait(1000)
+     cy.contains('D.R.E Financeiro').click({ force: true })
+
+     cy.waitVisible('#FMRetraidoDRE > .Info')  
+     cy.get('#FMRetraidoDRE > .Info').click({ force: true })
+     cy.waitVisible('#contas')  
+     cy.get('#contas').should('contain', descricaoConta)
+
+     })
+
+
+
+   it('Carregar D.R.E',()=>{
+     cy.logout()
+     cy.login('fin')
+     //Abrir lupa e pesquisar D.R.E
+     cy.waitVisible('#form\\:lupaAtiva')
+     cy.get('#form\\:lupaAtiva').click({ force: true })
+     cy.get('.panelBusca').type('DRE')
+     cy.wait(1000)
+     cy.contains('D.R.E Financeiro').click({ force: true })
+
+     cy.waitVisible('#formDRE\\:demonstrativoFinanComThread')  
+     cy.get('#formDRE\\:demonstrativoFinanComThread').click()
+     cy.waitVisible('#formDRE') 
+     cy.get('#formDRE').should('contain', '(+)Receita Bruta')
+    })
+
+
+    it('Carregar D.R.E sem adicionar data',()=>{
+      cy.logout()
+      cy.login('fin')
+      //Abrir lupa e pesquisar D.R.E
+      cy.waitVisible('#form\\:lupaAtiva')
+      cy.get('#form\\:lupaAtiva').click({ force: true })
+      cy.get('.panelBusca').type('DRE')
+      cy.wait(1000)
+      cy.contains('D.R.E Financeiro').click({ force: true })
+
+      cy.waitVisible('#formDRE\\:dataInicioRelatorioInputDate')  
+      cy.get('#formDRE\\:dataInicioRelatorioInputDate').clear()
+      cy.waitVisible('#formDRE\\:dataFimRelatorioInputDate') 
+      cy.get('#formDRE\\:dataFimRelatorioInputDate').clear()
+      cy.waitVisible('#formDRE\\:demonstrativoFinanComThread')
+      cy.get('#formDRE\\:demonstrativoFinanComThread').click()
+      cy.waitVisible('#formDRE') 
+      cy.get('#formDRE').should('contain', '(+)Receita Bruta')
+
+      })
+
+       it('D.R.E com outro tipo de consulta',()=>{
+         cy.logout()
+         cy.login('fin')
+         //Abrir lupa e pesquisar D.R.E
+         cy.waitVisible('#form\\:lupaAtiva')
+         cy.get('#form\\:lupaAtiva').click({ force: true })
+         cy.get('.panelBusca').type('DRE')
+         cy.wait(1000)
+         cy.contains('D.R.E Financeiro').click({ force: true })
+
+         cy.get('.fa-icon-sort-down').click()
+         cy.get('.tipoRelatorioCodigo1 > .tooltipster > .maginTipoRel > [style="width: 100%"] > div > .fa-icon-check-empty').click()
+         cy.waitVisible('#formDRE\\:demonstrativoFinanComThread')
+         cy.get('#formDRE\\:demonstrativoFinanComThread').click()
+         cy.waitVisible('#formDRE') 
+         cy.get('#formDRE').should('contain', '(+)Receita Bruta')
+        })
+
+          it('Centro de custo D.R.E',()=>{
+            cy.logout()
+            cy.login('fin')
+            //Abrir lupa e pesquisar D.R.E
+            cy.waitVisible('#form\\:lupaAtiva')
+            cy.get('#form\\:lupaAtiva').click({ force: true })
+            cy.get('.panelBusca').type('DRE')
+            cy.wait(1000)
+            cy.contains('D.R.E Financeiro').click({ force: true })
+
+            cy.waitVisible('#formDRE\\:chkMostraCentroCustos') 
+            cy.get('#formDRE\\:chkMostraCentroCustos').click()
+            cy.waitVisible('#formDRE\\:demonstrativoFinanComThread')
+            cy.get('#formDRE\\:demonstrativoFinanComThread').click()
+            cy.waitVisible('#formDRE') 
+            cy.get('#formDRE').should('contain', '(+)Receita Bruta')
+          })
+})

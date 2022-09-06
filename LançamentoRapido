@@ -1,0 +1,179 @@
+/// <reference types="cypress"/>
+
+const dataVencimento = Cypress.dayjs().add(30, 'day').format('DD/MM/YYYY');
+const dataCompetencia = Cypress.dayjs().format('DD/MM/YYYY');
+
+describe('Financeiro | Lancamentos', () => {
+
+
+    before(() => {
+     cy.logout()
+     cy.login('fin')
+     cy.FluxoCaixa('abrir')
+    
+    })
+
+
+    it('Lancamento Rapido, verificar tela carregou com sucesso',()=> {
+     cy.logout()
+     cy.login('fin')
+
+     cy.waitVisible('.MENU-LANCAMENTO_CONTA_RAPIDO')
+     cy.get('.MENU-LANCAMENTO_CONTA_RAPIDO').click()
+
+     cy.waitVisible('.container-header-titulo')
+     cy.get('.container-header-titulo').should('contain', 'LANÇAMENTO DE CONTA RÁPIDO').and('be.visible')
+     cy.get('#form\\:ok').should('be.visible')
+     cy.get('#form\\:msgContaPagar').should('contain', 'Informe os Dados')
+
+    })
+
+
+    it('Lancamento Rapido, gravar sem preencher',()=> {
+     cy.waitVisible('#form\\:ok')
+     cy.get('#form\\:ok').click()
+     cy.waitVisible('#form\\:msgContaPagar')
+     cy.get('#form\\:msgContaPagar').should('contain', 'Não Foi Possível Realizar esta Operação')
+        
+    })  
+    
+     
+    it('Lancamento Rapido, sem preencher forma de pagamento',()=> {
+     cy.waitVisible('#form\\:pessoa')
+     cy.wait(30000)
+     cy.get('#form\\:pessoa').type('AA_p')
+     //cy.wait(5000)
+     cy.get('.richfaces_suggestionEntry > :nth-child(2)').click()
+ 
+     cy.wait(5000)
+     cy.waitVisible('#form\\:descricao')
+     cy.get('#form\\:descricao').type('teste lançamento rapido')
+     cy.wait(2000)
+     cy.waitVisible('#form\\:valor')
+     cy.get('#form\\:valor').clear().type('100,00')
+     cy.wait(1000)
+
+        cy.get('#form\\:dataCompetenciaInputDate').then(inputCompetencia => { 
+
+         cy.waitVisible('#form\\:dataCompetenciaInputDate')
+         cy.get('#form\\:dataCompetenciaInputDate').should('be.visible')
+         cy.wait(1100)
+         inputCompetencia.val(dataCompetencia)
+
+             cy.get('#form\\:dataVencimentoInputDate').then( inputVencimento => {
+                    
+             cy.waitVisible('#form\\:dataCompetenciaInputDate')
+              cy.get('#form\\:dataCompetenciaInputDate').should('be.visible')
+              cy.wait(1100)
+              inputVencimento.val(dataVencimento)
+
+              cy.waitVisible('#form\\:ok')
+              cy.get('#form\\:ok').click()
+              cy.waitVisible('#form\\:msgContaPagar')
+              cy.get('#form\\:msgContaPagar').should('contain', 'Não Foi Possível Realizar esta Operação')
+                 
+            })
+        })
+    })
+
+     
+    it('Lancamento Rapido, sem preencher conta',()=> {
+ 
+     cy.waitSelectValue('#form\\:formaPagamento', 'DINHEIRO')
+     cy.get('#form\\:formaPagamento').select('DINHEIRO')
+     cy.waitVisible('#form\\:ok')
+     cy.get('#form\\:ok').click()
+     cy.waitVisible('#form\\:msgContaPagar')
+     cy.get('#form\\:msgContaPagar').should('contain', 'Não Foi Possível Realizar esta Operação')
+
+    })
+
+
+       
+    it('Lancamento Rapido, preenchendo conta',()=> {
+
+    //------Desmarca opção 'Habilitar exportação para sistema contábil AlterData'----//
+
+     cy.visit('faces/pages/finan/finanConfiguracoes.jsp?modulo=financeiroWeb')
+     cy.wait(500)
+     cy.get('[type="checkbox"]').check()
+     cy.wait(500)
+     cy.waitVisible('#form\\:habilitarExportacaoAlterData')
+     cy.get('#form\\:habilitarExportacaoAlterData').click({ force: true })
+     cy.wait(500)
+     cy.get('#form\\:novo').click()
+     cy.wait(500)
+     cy.get('.mensagem').should('contain','Dados Gravados com Sucesso')
+
+
+     //------Inicio Teste de preencher conta corretamente-----//
+
+     cy.visit('faces/pages/finan/telaInicialFinan.jsp')
+     cy.waitVisible('.MENU-LANCAMENTO_CONTA_RAPIDO')
+     cy.get('.MENU-LANCAMENTO_CONTA_RAPIDO').click()
+
+     cy.waitVisible('#form\\:pessoa')
+     cy.wait(30000)
+     cy.get('#form\\:pessoa').type('AA_p')
+     cy.wait(5000)
+     cy.get('.richfaces_suggestionEntry > :nth-child(2)').click()
+    
+     cy.wait(5000)
+     cy.waitVisible('#form\\:descricao')
+     cy.get('#form\\:descricao').type('teste lançamento rapido')
+     cy.wait(2000)
+     cy.waitVisible('#form\\:valor')
+     cy.get('#form\\:valor').clear().type('100,00')
+     cy.wait(1000)
+   
+         cy.get('#form\\:dataCompetenciaInputDate').then(inputCompetencia => { 
+   
+         cy.waitVisible('#form\\:dataCompetenciaInputDate')
+         cy.get('#form\\:dataCompetenciaInputDate').should('be.visible')
+         cy.wait(1100)
+         inputCompetencia.val(dataCompetencia)
+   
+             cy.get('#form\\:dataVencimentoInputDate').then( inputVencimento => {
+                       
+             cy.waitVisible('#form\\:dataCompetenciaInputDate')
+             cy.get('#form\\:dataCompetenciaInputDate').should('be.visible')
+             cy.wait(1100)
+             inputVencimento.val(dataVencimento)
+
+   
+             cy.waitSelectValue('#form\\:formaPagamento', 'DINHEIRO')
+             cy.get('#form\\:formaPagamento').select('DINHEIRO')
+
+             cy.waitSelectValue('#form\\:conta', 'Banco da Empresa')
+             cy.get('#form\\:conta').select('Banco da Empresa')
+
+             cy.waitVisible('#form\\:ok')
+             cy.get('#form\\:ok').click()
+                 
+
+             cy.waitVisible('#form\\:msgContaPagar')
+             cy.get('#form\\:msgContaPagar').should('contain', 'Dados Gravados com Sucesso')
+               
+               
+           
+            })
+          
+         })
+
+    })
+   
+        
+    it('Ver Lançamento',()=> {
+     cy.logout()
+     cy.login('fin')
+     cy.waitVisible('.MENU-LANCAMENTOS')
+     cy.get('.MENU-LANCAMENTOS').click()
+
+     cy.waitVisible('.container-header-titulo')
+     cy.get('.container-header-titulo').should('contain', 'Lançamentos Financeiros')
+     cy.get('.container-box').should('contain', 'AA_PRIMEIRO CLIENTE')
+     
+    })
+
+
+})

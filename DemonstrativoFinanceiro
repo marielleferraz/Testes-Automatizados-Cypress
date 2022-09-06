@@ -1,0 +1,106 @@
+/// <reference types="cypress"/>
+
+
+const descricaoConta = 'Conta TESTE'
+//const descricaoContaEditado = 'teste de conta editado'
+
+const dataVencimento = Cypress.dayjs().add(30, 'day').format('DD/MM/YYYY');
+const dataCompetencia = Cypress.dayjs().format('DD/MM/YYYY');
+
+describe('Excluir conta', () => {
+
+//  before(() => {
+   
+//     cy.logout()
+//     cy.login('fin')
+    
+//  })
+
+      it('Cadastro de conta',()=>{
+      //Cadastro conta
+     cy.visit('faces/finanContaCons.jsp?modulo=financeiroWeb')
+     cy.waitVisible('#form\\:btnNovo')
+     cy.get('#form\\:btnNovo').click({ force: true })
+     cy.waitVisible('#form\\:empresaCombo')
+     cy.get('#form\\:empresaCombo').select('1')  
+     cy.get('#form\\:tipoContaCombo').select('1')  
+     cy.get('#form\\:descricaoRichEditor').type(descricaoConta)    
+     cy.get('#form\\:j_id_jsp_1168590460_51').click({ force: true })
+     cy.get('.mensagem').should('have.text', 'Dados Gravados com Sucesso');
+
+     
+    })
+
+    
+    it('Filtro',()=>{
+    //Teste do filtro
+     cy.get('[value="Voltar para a Lista"]').click()
+     cy.waitVisible('#tblConta')
+     cy.get('.dataTables_filter > div').clear().type(descricaoConta)
+
+
+    })
+
+       
+    it('Conta Demonstrativo Financeiro ', () => {
+     //Validando cadastro de conta no Demonstrativo Financeiro
+     cy.logout()
+     cy.login('fin')
+     cy.abrirFuncLupa('Demonstrativo Financeiro')
+     cy.waitVisible('#FMRetraido > .Info')  
+     cy.get('#FMRetraido > .Info').click({ force: true })
+     cy.waitVisible('#contas')  
+     cy.get('#contas').should('contain', descricaoConta)
+
+     })
+
+
+
+   it.only('Demonstrativo Financeiro',()=>{
+     cy.logout()
+     cy.login('fin')
+     cy.abrirFuncLupa('Demonstrativo Financeiro') 
+     cy.waitVisible('#formDF\\:demonstrativoFinanComThread')  
+     cy.get('#formDF\\:demonstrativoFinanComThread').click()
+     cy.waitVisible('.tituloDemonstrativo') 
+     cy.get('.tituloDemonstrativo').should('contain', 'Receitas ')
+    })
+
+
+    it('Demonstrativo Financeiro sem adicionar data',()=>{
+      cy.logout()
+      cy.login('fin')
+      cy.abrirFuncLupa('Demonstrativo Financeiro') 
+      cy.waitVisible('#formDF\\:dataInicioRelatorioInputDate')  
+      cy.get('#formDF\\:dataInicioRelatorioInputDate').clear()
+      cy.waitVisible('#formDF\\:dataFimRelatorioInputDate') 
+      cy.get('#formDF\\:dataFimRelatorioInputDate').clear()
+      cy.waitVisible('#formDF\\:demonstrativoFinanComThread')
+      cy.get('#formDF\\:demonstrativoFinanComThread').click()
+      cy.waitVisible('.tituloDemonstrativo') 
+      cy.get('.tituloDemonstrativo').should('contain', 'Receitas ')
+      })
+
+       it('Pesquisar Demonstrativo Financeiro com outro tipo de consulta',()=>{
+         cy.logout()
+         cy.login('fin')
+         cy.abrirFuncLupa('Demonstrativo Financeiro') 
+         cy.get('.fa-icon-sort-down').click()
+         cy.get('.tipoRelatorioCodigo1 > .tooltipster > .maginTipoRel > [style="width: 100%"] > div > .fa-icon-check-empty').click()
+         cy.waitVisible('#formDF\\:demonstrativoFinanComThread')
+         cy.get('#formDF\\:demonstrativoFinanComThread').click()
+         cy.waitVisible('.tituloDemonstrativo') 
+         cy.get('.tituloDemonstrativo').should('contain', 'Receitas ')
+        })
+
+        it('Pesquisar Centro de custo Demonstrativo Financeiro',()=>{
+            //cy.logout()
+            cy.login('fin')
+            cy.abrirFuncLupa('Demonstrativo Financeiro') 
+            cy.get('#formDF\\:radioTipoVisualizacao\\:1').click()
+            cy.waitVisible('#formDF\\:demonstrativoFinanComThread')
+            cy.get('#formDF\\:demonstrativoFinanComThread').click()
+            cy.waitVisible('.tituloDemonstrativo') 
+            cy.get('.tituloDemonstrativo').should('contain', 'Academia ')
+           })
+})

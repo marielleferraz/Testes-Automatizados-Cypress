@@ -1,0 +1,30 @@
+/// <reference types="cypress"/>
+
+import {nome} from '../../../support/commands';
+const idConvenioDeCobranca = '25';
+
+describe('Autorizacao de cobranca', () => {
+
+  before( () => {
+
+    cy.login('adm')
+    cy.CadastrarCliente();
+
+    cy.get('body').then(($el) => {
+      cy.abrirAlunoLupa(`${nome}{enter}`)
+      cy.wait(5000)
+
+    })
+
+  })
+
+  //SKIP - Está dando erro no sandbox da Cielo. Só retirar esse skip após a Cielo arrumar o problema. Dá erro ao incluir o cartão.
+  it.skip('Verificar mensagem de aviso sem adicionar produto especifico',()=> {
+    cy.incluirAutorizacaoCobranca(idConvenioDeCobranca, nome);
+    cy.get('.listaSuspensa').select('Produtos Especificados')
+    cy.get('#form\\:tabAutorizacao\\:0\\:editarTipoACobrarNovo').click({force:true})
+    cy.get('#titleInfo').should('contain', 'Não Foi Possível Realizar esta Operação');
+    
+  })
+
+})

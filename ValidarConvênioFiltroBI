@@ -1,0 +1,55 @@
+/// <reference types="cypress" />
+
+
+describe.skip('Validar convenio cadastrado no filtro BI', () => {
+//Ambiente de teste não esta carregando a opção Codigo Autenticação para ser digitado.
+    it('Cadastro convenio cobrança', () => {
+
+        cy.login('adm');
+        cy.visit('faces/convenioCobrancaCons.jsp');
+        cy.waitVisible('#form\\:btnNovo');
+        cy.get('#form\\:btnNovo').click();
+        cy.waitVisible('#form\\:salvar');
+        cy.get('#form\\:tipoConvenio').select('DCC_GETNET_ONLINE');
+        cy.waitVisible('#form\\:descricao');
+        cy.get('#form\\:descricao').type('convenio teste');
+        cy.waitVisible('#form\\:numeroContrato');
+        cy.get('#form\\:numeroContrato').type('12345{enter}');
+        cy.waitVisible('#form\\:codigoAutenticacao01');
+        cy.value('#form\\:codigoAutenticacao01', '12345');
+        cy.waitVisible('#form\\:codigoAutenticacao02');
+        cy.value('#form\\:codigoAutenticacao02', '00000-111-00000-1111-0000');
+        cy.value('#form\\:codigoAutenticacao03', '111111');
+        cy.wait(1000)
+        cy.get('#form\\:codigoAutenticacao03').click({ force: true});
+        cy.waitVisible('#form\\:salvar');
+        cy.wait(1000)
+        cy.get('#form\\:salvar').click({force:true});
+        cy.waitVisible('.mensagem');
+        cy.get('.mensagem').should('have.text', 'Dados gravados com sucesso!');
+
+    })
+
+   it('Validar convenio cadastrado no filtro BI',() =>{
+     cy.login('adm');
+     cy.get('#form\\:linkBIMenuSuperior').click()
+     cy.waitVisible('#form\\:dataInicioDCCPopupButton');
+     cy.get('#form\\:consultarCR').siblings().eq(2).click({force:true})
+     cy.waitVisible('#panelFiltroConvenioCobrancaHeader')
+     cy.get('#formPanelFiltroConvenioCobranca > .paginaFontResponsiva > [style="display\\: inline-block;padding\\: 5px; width\\: 100%;"]')
+     .should('contain', 'CONVENIO TESTE');
+
+    })
+
+ 
+   it('Abrir relatorio de Alunos com contrato ativo',() =>{
+     cy.login('adm');
+     cy.visit('faces/recorrenciaClienteForm.jsp');
+     cy.waitVisible('#.caixaMenuLatel')
+     cy.get('.caixaMenuLatel').should('contain', 'Mostrar Paginação');
+  
+      })
+
+
+
+ });       

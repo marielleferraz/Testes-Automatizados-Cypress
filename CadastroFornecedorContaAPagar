@@ -1,0 +1,140 @@
+/// <reference types="cypress"/>
+
+describe('Agendamento Conta a Pagar', function(){
+
+
+    beforeEach(() => {
+        cy.logout()
+        cy.login('fin')
+    })
+
+
+ //Opção: Cadastrar Fornecedor-CNPJ obrigatório nas configurações financeiro MARCADO//
+
+
+    it('Cadastrar Fornecedor CNPJ/CPF obrigatório', function(){
+
+        cy.visit('faces/pages/finan/finanConfiguracoes.jsp?modulo=financeiroWeb')
+        cy.waitVisible('#form\\:novo')
+        cy.get('[type="checkbox"]').check()
+        cy.get('#form\\:novo').click()
+        cy.waitVisible('.mensagem')
+        cy.get('.mensagem').should('have.text', 'Dados Gravados com Sucesso')
+
+    })
+
+    it('Conta a pagar, Cadastro Fornecedor sem CNPJ e sem contato', function () {
+        
+     cy.contains('Nova conta a pagar').click()
+     cy.get('#formLanc\\:pessoa').type('TESTE FORNECEDOR SEM CNPJ')
+     cy.wait(5000)
+     cy.waitVisible('.rich-sb-cell-padding')
+     cy.get('.rich-sb-cell-padding').click()
+     cy.waitVisible('#formCadastrarNovaPessoa\\:okPessoa')
+     cy.get('#formCadastrarNovaPessoa\\:okPessoa').click()
+     cy.get('.mensagemDetalhada').should('contain','O campo CNPJ deve ser informado!')
+    
+    })
+     
+    it('Conta a pagar, Cadastro Fornecedor sem CPF', function () {
+        
+     cy.contains('Nova conta a pagar').click()
+     cy.get('#formLanc\\:pessoa').type('TESTE FORNECEDOR SEM CPF')
+     cy.wait(5000)
+     cy.waitVisible('.rich-sb-cell-padding')
+     cy.get('.rich-sb-cell-padding').click()
+     cy.waitVisible('#formCadastrarNovaPessoa\\:tipoPessoa\\:1')
+     cy.get('#formCadastrarNovaPessoa\\:tipoPessoa\\:1').click({ force: true })
+     cy.waitVisible('#formCadastrarNovaPessoa\\:okPessoa')
+     cy.get('#formCadastrarNovaPessoa\\:okPessoa').click()
+     cy.get('.mensagemDetalhada').should('contain','O campo CPF deve ser informado!')
+    
+    
+    })
+
+     
+    it('Conta a pagar, Cadastro Fornecedor com CPF', function () {
+        
+     cy.contains('Nova conta a pagar').click()
+     cy.get('#formLanc\\:pessoa').type('TESTE FORNECEDOR COM CPF')
+     cy.wait(5000)
+     cy.waitVisible('.rich-sb-cell-padding')
+     cy.get('.rich-sb-cell-padding').click()
+     cy.waitVisible('#formCadastrarNovaPessoa\\:tipoPessoa\\:1')
+     cy.get('#formCadastrarNovaPessoa\\:tipoPessoa\\:1').click({ force: true })
+     cy.waitVisible('#formCadastrarNovaPessoa\\:cfp')
+     cy.get('#formCadastrarNovaPessoa\\:cfp').type('12312874032')
+     cy.waitVisible('#formCadastrarNovaPessoa\\:okPessoa')
+     cy.get('#formCadastrarNovaPessoa\\:okPessoa').click()
+     cy.get('#formLanc\\:msgContaPagar').should('contain','Informe os Dados')
+    
+    
+    })
+
+
+
+ //Opção: Cadastrar Fornecedor-CNPJ obrigatório nas configurações financeiro DESMARCADO//
+
+
+
+     it('Cadastrar Fornecedor CNPJ/CPF obrigatório desmarcado', function(){
+
+     cy.visit('faces/pages/finan/finanConfiguracoes.jsp?modulo=financeiroWeb')
+     cy.wait(500)
+     cy.get('#form\\:cnpjObrigatorioFornecedor').click()
+     cy.wait(500)
+     cy.get('#form\\:novo').click()
+     cy.wait(500)
+     cy.get('.mensagem').should('contain','Dados Gravados com Sucesso')
+
+    })
+
+    it('Conta a pagar, Cadastro Fornecedor sem CNPJ e sem contato', function () { 
+
+        cy.contains('Nova conta a pagar').click()
+        cy.get('#formLanc\\:pessoa').type('TESTE FORNECEDOR SEM CNPJ')
+        cy.wait(5000)
+        cy.waitVisible('.rich-sb-cell-padding')
+        cy.get('.rich-sb-cell-padding').click()
+        cy.waitVisible('#formCadastrarNovaPessoa\\:okPessoa')
+        cy.get('#formCadastrarNovaPessoa\\:okPessoa').click()
+        cy.waitVisible('.mensagemDetalhada')
+        cy.get('.mensagemDetalhada').should('contain','O campo Contato deve ser informado!')
+        
+    })
+
+    it('Conta a pagar, Cadastro Fornecedor sem CNPJ e com contato', function () {
+
+        cy.contains('Nova conta a pagar').click()
+        cy.get('#formLanc\\:pessoa').type('TESTE FORNECEDOR COM CNPJ')
+        cy.wait(5000)
+        cy.waitVisible('.rich-sb-cell-padding')
+        cy.get('.rich-sb-cell-padding').click()
+        cy.waitVisible('#formCadastrarNovaPessoa\\:contato')
+        cy.get('#formCadastrarNovaPessoa\\:contato').type('62981225522')
+        cy.waitVisible('#formCadastrarNovaPessoa\\:okPessoa')
+        cy.get('#formCadastrarNovaPessoa\\:okPessoa').click()
+        cy.waitVisible('#formLanc\\:msgContaPagar')
+        cy.get('#formLanc\\:msgContaPagar').should('contain','Informe os Dados')
+        
+    })
+
+     
+    it('Conta a pagar, Cadastro Fornecedor sem CPF sem contato', function () {
+
+        cy.contains('Nova conta a pagar').click()
+        cy.get('#formLanc\\:pessoa').type('TESTE FORNECEDOR SEM CPF')
+        cy.wait(5000)
+        cy.waitVisible('.rich-sb-cell-padding')
+        cy.get('.rich-sb-cell-padding').click()
+        cy.waitVisible('#formCadastrarNovaPessoa\\:tipoPessoa\\:1')
+        cy.get('#formCadastrarNovaPessoa\\:tipoPessoa\\:1').click({ force: true })
+        cy.get('#formCadastrarNovaPessoa\\:cfp')
+        cy.waitVisible('#formCadastrarNovaPessoa\\:okPessoa')
+        cy.get('#formCadastrarNovaPessoa\\:okPessoa').click()
+        cy.get('#formLanc\\:msgContaPagar').should('contain','Informe os Dados') 
+        
+     })
+ 
+
+})

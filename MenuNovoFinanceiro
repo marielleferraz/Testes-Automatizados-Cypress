@@ -1,0 +1,170 @@
+//Teste referente ao ticket PAY- 3025- Novo Menu
+
+/// <reference types="cypress" />
+
+//tirar skip quando a pipeline rodar no novo menu
+
+describe.skip('Validar telas menu novo', function () {
+
+    before(() => {
+        cy.login('fin')
+        cy.wait(500)
+    })
+
+    it('Opção Bussiness Intelligence', function () {
+        //validar Bussiness Intelligence
+        cy.wait(500)
+        cy.contains('Business Intelligence').click({ force: true })
+        cy.wait(500)
+        cy.get('[id="chartdiv"]').should('contain', 'Resumo financeiro')
+  
+    })
+
+    it('Opção de lançamentos no novo menu', function () {
+
+        cy.visit('faces/pages/finan/telaInicialFinan.jsp')
+        cy.contains('Lançamentos').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-mask menus"]').should('contain', 'Contas a pagar')
+        cy.get('[class="container-mask menus"]').should('contain', 'Contas a receber')
+        cy.get('[class="container-mask menus"]').should('contain', 'Ver lançamentos')
+        cy.get('[class="container-mask menus"]').should('contain', 'Lançamento rápido')
+
+        cy.contains('Contas a pagar').click({ force: true })
+        cy.get('[class="container-mask menus"]').should('contain', 'Ver contas a Pagar')
+        cy.get('[class="container-mask menus"]').should('contain', 'Nova conta a pagar')
+
+        cy.contains('Ver contas a Pagar').click({ force: true })
+        cy.get('[id="form:tituloContasAPagar"]').should('contain', 'Contas a Pagar')
+        cy.wait(500)
+
+        cy.contains('Contas a receber').click({ force: true })
+        cy.get('[class="container-mask menus"]').should('contain', 'Ver contas a Receber')
+        cy.get('[class="container-mask menus"]').should('contain', 'Nova conta a Receber')
+        cy.wait(500)
+
+        cy.contains('Ver lançamentos').click({ force: true })
+        cy.get('[class="container-header-titulo"]').should('contain', 'Lançamentos Financeiros')
+        cy.wait(500)
+        cy.contains('Lançamento rápido').click({ force: true })
+        cy.get('[class="container-header-titulo"]').should('contain', 'LANÇAMENTO DE CONTA RÁPIDO')
+
+    })
+
+   
+    it('Opção Gestão', function () {
+
+        cy.visit('faces/pages/finan/telaInicialFinan.jsp')
+        cy.contains('Gestão').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-mask menus"]').should('contain', 'Recebíveis')
+        cy.get('[class="container-mask menus"]').should('contain', 'Lotes')
+        
+
+        cy.contains('Recebíveis').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-header-titulo"]').should('contain', 'Gestão de Recebíveis')
+    
+
+        cy.contains('Lotes').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-header-titulo"]').should('contain', 'Gestão de Lotes ')
+         
+
+    })
+ 
+       
+    it('Opção Caixa', function () {
+
+        cy.visit('faces/pages/finan/telaInicialFinan.jsp')
+        cy.contains('Caixa').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-mask menus"]').should('contain', 'Caixa Administrativo')
+        cy.get('[class="container-mask menus"]').should('contain', 'Fechar caixa')
+        cy.get('[class="container-mask menus"]').should('contain', 'Consultar caixa')
+        cy.get('[class="container-mask menus"]').should('contain', 'Bloqueio de caixa')
+
+        cy.contains('Caixa Administrativo').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-header-titulo"]').should('contain', 'Operações realizadas no Caixa-Administrativo:3')
+    
+
+        cy.contains('Fechar caixa').click({ force: true })
+        cy.wait(500)
+        cy.get('[id="modalFecharCaixasHeader"]').should('contain', 'Fechamento de Caixa')
+        cy.contains('Fechar').click({ force: true })
+
+        cy.contains('Consultar caixa').click({ force: true })
+        cy.wait(500)
+        cy.get('[id="modalConsCaixaHeader"]').should('contain', 'Consulta Histórico de Caixas')
+
+        cy.visit('/faces/pages/finan/telaCaixa.jsp')
+        cy.contains('Bloqueio de caixa').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-header-titulo"]').should('contain', 'Bloqueio de caixa')
+    })
+
+    it('Opção Resumo de  Contas', function () {
+
+        cy.visit('faces/pages/finan/resumoContas.jsp')
+        cy.get('.container-header-titulo').should('contain', 'Resumo de Contas')
+        cy.get('[class="pct pct-arrow-left-circle"]').eq(0).click({ force: true })
+
+    })
+
+    it('Opção Cadastros Auxiliares', function () {
+
+        cy.contains('Cadastros Auxiliares').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-mask menus"]').should('contain', 'Fornecedor')
+        cy.get('[class="container-mask menus"]').should('contain', 'Pessoa')
+        cy.get('[class="container-mask menus"]').should('contain', 'Conta')
+        cy.get('[class="container-mask menus"]').should('contain', 'Tipo de Conta')
+        cy.get('[class="container-mask menus"]').should('contain', 'Tipo de Documento')
+        cy.get('[class="container-mask menus"]').should('contain', 'Categoria de Clientes')
+        cy.get('[class="container-mask menus"]').should('contain', 'Cliente')
+        cy.get('[class="container-mask menus"]').should('contain', 'Colaborador')
+        cy.get('[class="container-mask menus"]').should('contain', 'Grau de Instrução')
+        cy.get('[class="container-mask menus"]').should('contain', 'Profissão')
+        cy.get('[class="container-mask menus"]').should('contain', 'País')
+        cy.get('[class="container-mask menus"]').should('contain', 'Cidade')
+    })
+
+    it('Opção Config.Financeira', function () {
+       
+        cy.get('[class="pct pct-arrow-left-circle"]').eq(6).click({ force: true })
+        cy.contains('Config. financeiras').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-mask menus"]').should('contain', 'Rateio Integração')
+        cy.get('[class="container-mask menus"]').should('contain', 'Plano de Contas')
+        cy.get('[class="container-mask menus"]').should('contain', 'Centro de Custo')
+        cy.get('[class="container-mask menus"]').should('contain', 'Cheques/Cartões Avulsos')
+        cy.get('[class="container-mask menus"]').should('contain', 'Estorno de Pagamento')
+        cy.get('[class="container-mask menus"]').should('contain', 'Mov. de CC do Cliente')
+        cy.get('[class="container-mask menus"]').should('contain', 'Movimento do Produto')
+        cy.get('[class="container-mask menus"]').should('contain', 'Banco')
+        cy.get('[class="container-mask menus"]').should('contain', 'Formas de Pagamento')
+        cy.get('[class="container-mask menus"]').should('contain', 'Operadora de Cartão')
+        cy.get('[class="container-mask menus"]').should('contain', 'Metas do Financeiro')
+        
+    })
+
+    it('Opção Relatório Financeiro', function () {
+       
+        cy.get('[class="pct pct-arrow-left-circle"]').eq(6).click({ force: true })
+        cy.contains('Rel. Financeiro').click({ force: true })
+        cy.wait(500)
+        cy.get('[class="container-mask menus"]').should('contain', 'Demonstrativo Financeir')
+        cy.get('[class="container-mask menus"]').should('contain', 'D.R.E Financeiro')
+        cy.get('[class="container-mask menus"]').should('contain', 'Movimentações Financeir')
+        cy.get('[class="container-mask menus"]').should('contain', 'Cheques Devolvidos')
+        cy.get('[class="container-mask menus"]').should('contain', 'Fluxo de Caixa')
+        
+    })
+
+    it('Opção Cadeado', function () {
+       
+        cy.get('#form\\:btnCaixaFZWuiFin > .pct')
+        
+    })
+})

@@ -1,0 +1,137 @@
+/// <reference types="cypress"/>
+
+import {nome} from '../../../support/commands';
+
+describe('Gestao de recebiveis', () => {
+  before( () => {
+   cy.logout()
+   cy.login('adm')
+   cy.CadastrarCliente(); 
+   cy.get('body').then($el=>{ 
+     
+   cy.log('NOME: ' + nome);
+     cy.LancarVendaAvulsaParaAluno(nome);
+     cy.get('#form\\:btnReceberCaixaAberto').click()
+     cy.fluxoPagamento();
+     
+   }) 
+    
+   }) 
+
+
+   beforeEach( () => {
+  
+      
+   
+
+  }) 
+     
+    //skip - Cypress Dashboard ZW 5673
+      it('Verificar mensagem de aviso Apenas recebiveis sem preencher data',()=> {
+      cy.login('fin')
+      cy.visit('faces/pages/finan/gestaoRecebiveis.jsp#noback')
+      cy.get('#refazerConsulta').click()
+      cy.get('#formFiltrosGestaoRecebiveis\\:limparFiltros > span').click()
+      cy.wait(5000)
+      cy.get('#formFiltrosGestaoRecebiveis\\:filtrosLote').click()
+      cy.get('#formFiltrosGestaoRecebiveis\\:statusMov').select('Apenas movimentados')
+      cy.get('#formFiltrosGestaoRecebiveis\\:dataInicioCaInputDate').type('01042022')
+      cy.get('#formFiltrosGestaoRecebiveis\\:dataTerminoCaInputDate').type('01052022')
+      cy.get('#formFiltrosGestaoRecebiveis\\:pesquisar > span').click()
+      cy.get('#titleInfo').should('contain','Não Foi Possível Realizar esta Operação')
+
+      
+
+     })
+     
+      //skip - Cypress Dashboard ZW 5673
+      it("Verificar mensagem de aviso periodo maior que 31 dias",() => {
+        cy.login('fin')
+        cy.visit('faces/pages/finan/gestaoRecebiveis.jsp#noback')
+        cy.get('#refazerConsulta').click()
+        cy.get('#formFiltrosGestaoRecebiveis\\:limparFiltros > span').click()
+        cy.wait(5000)
+        cy.get('#formFiltrosGestaoRecebiveis\\:dataInicioLInputDate').type('01032022')
+        cy.get('#formFiltrosGestaoRecebiveis\\:dataTerminoLInputDate').type('01052022')
+        cy.get('#formFiltrosGestaoRecebiveis\\:pesquisar > span').click()
+        cy.get('#messageInfo').should('contain','Para pesquisar um período superior à 31 dias, selecione mais um filtro')
+
+
+       })
+        
+       //skip - Cypress Dashboard ZW 5673
+        it('Verificar mensagem de aviso quando não tem cheque',() => {
+        cy.login('fin')
+        cy.visit('faces/pages/finan/gestaoRecebiveis.jsp#noback')
+        cy.get('#refazerConsulta').click()
+        cy.get('#formFiltrosGestaoRecebiveis\\:limparFiltros > span').click()
+        cy.wait(5000)
+        cy.get('#formFiltrosGestaoRecebiveis\\:dataInicioLInputDate').type('01052022')
+        cy.get('#formFiltrosGestaoRecebiveis\\:dataTerminoLInputDate').type('16052022')
+        cy.get('#formFiltrosGestaoRecebiveis\\:antecipados').click()
+        cy.get('#formFiltrosGestaoRecebiveis\\:pesquisar > span').click()
+        cy.get('#titleInfo').should('contain','Recebível não encontrado')
+
+        })
+  
+        //skip - Cypress Dashboard ZW 5673
+         it('Compensados de hoje',() => {
+          cy.logout()
+          cy.login('fin')
+          cy.visit('faces/pages/finan/gestaoRecebiveis.jsp#noback')
+          cy.get('#form\\:btnCaixaOntem').siblings().last().click()
+          cy.get('[id^="formaPagamento"]').contains('DINHEIRO').click()
+          cy.waitVisible('#form\\:listaOutros\\:nomePagadoravheader')
+          cy.get('[id^="form\\:listaOutros"]').should('contain',nome.toUpperCase())
+          
+        })
+
+
+        
+        
+       //SKIP - LIBERAR PIPELINE, CYPRESS DASHBOARD ZW 5641
+       it('Compensados de ontem',() => {
+       cy.logout()
+       cy.login('fin', Cypress.dayjs().add(1, 'day').format('DD/MM/YYYY'))
+
+           cy.get('body').then(el => { 
+            cy.waitVisible('#form\\:menuLateral')
+            cy.wait(2000)
+  
+            cy.get('body').then(el => { 
+                  
+            let caixaEstaAberto = el.find('.MENU-ABRIR_CAIXA').length
+      
+            if (caixaEstaAberto != 0) { 
+             cy.FluxoCaixa('abrir')
+             cy.login('fin')
+               
+            }
+
+            cy.visit('faces/pages/finan/gestaoRecebiveis.jsp#noback')
+            cy.get('#form\\:btnCaixaOntem').click()
+            cy.waitVisible('#form\\:listaOutros\\:nomePagadoravheader')
+            cy.get('[id^="formaPagamento"]').contains('DINHEIRO').click()
+            cy.waitVisible('#form\\:listaOutros\\:nomePagadoravheader')
+            cy.get('[id^="form\\:listaOutros"]').should('contain',nome.toUpperCase())
+  
+              
+           })
+           })
+           })
+
+
+             //skip #5673  liberar pipeline
+             it('Movimentar sem adicionar conta',() => {
+             cy.get('#form\\:listaOutros\\:j_id_jsp_1484238077_63pc20header\\:sortDiv > .chk-fa-container > input').click()
+             cy.waitVisible('#form\\:depositaroutros2')
+             cy.get('#form\\:depositaroutros2').click({force : true})
+             cy.waitVisible('#formDeposito\\:btnOKModalOperacaoComRecebiveis')
+             cy.get('#formDeposito\\:btnOKModalOperacaoComRecebiveis').click({force : true})
+             cy.waitVisible('[class="mensagemDetalhada"]')
+             cy.get('[class="mensagemDetalhada"]').should('contain','O campo DESCRIÇÃO (Lançamento) deve ser informado.')
+              
+          
+            })
+
+})

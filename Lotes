@@ -1,0 +1,54 @@
+/// <reference types="cypress"/>
+
+describe('Financeiro | Gestao', () => {
+
+    it('Lotes, verificar tela carregou com sucesso',()=> {
+
+        cy.logout()
+        cy.login('fin')
+
+        cy.waitVisible('.MENU-LOTES')
+        cy.get('.MENU-LOTES').click()
+
+        cy.waitVisible('.container-header-titulo')
+        cy.get('.container-header-titulo').should('contain', 'Gestão de Lotes').and('be.visible')
+        cy.get('#refazerConsulta').should('be.visible')
+        cy.get('.mensagem').should('contain', 'Dados Consultados com Sucesso')
+
+    })
+
+    
+    it('Pesquisar sem preencher data',()=> {
+
+     cy.get('#refazerConsulta').click({force : true})
+     cy.get('#formFiltrosGestaoLotes\\:limparPeriodoLancamento > .fa-icon-eraser').click({force : true})
+     cy.contains('Pesquisar').click({force : true})
+     cy.get('.container-box').should('contain', 'Não Foi Possível Realizar esta Operação')
+    
+    })
+
+    it('Limpar filtro',()=> {
+
+        cy.logout()
+        cy.login('fin')
+
+        cy.waitVisible('.MENU-LOTES')
+        cy.get('.MENU-LOTES').click()
+
+        cy.waitVisible('.container-header-titulo')
+        
+        cy.get('.container-header-titulo').should('contain', 'Gestão de Lotes').and('be.visible')
+        cy.waitVisible('#refazerConsulta')
+        cy.get('#refazerConsulta').should('be.visible')
+       
+        cy.get('#refazerConsulta').click({force : true})
+        cy.contains('Limpar filtros').click({force : true})
+        cy.wait(5000)
+        cy.contains('Pesquisar').click({force : true})
+        cy.waitVisible('.container-box')
+        cy.get('.container-box').should('contain', 'Não Foi Possível Realizar esta Operação')
+       
+       })
+   
+
+})
